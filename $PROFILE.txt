@@ -1,0 +1,1 @@
+function code { code.exe $args > $null 2>&1 }

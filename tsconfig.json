@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2021",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false,
+    "noErrorTruncation": true,
+    // Keep these mappings synchronized with the ones in jest.config.js as you add new modules
+    "paths": {
+      "@data/*": ["data/*"],
+      "@common/*": ["src/common/*"],
+      "@config/*": ["src/config/*"],
+      "@book/*": ["src/module/book/*"],
+      "@genre/*": ["src/module/genre/*"],
+      "@iam/*": ["src/module/iam/*"],
+      "@test/*": ["src/test/*"],
+      "@/*": ["src/*"],
+      "@root/*": ["*"]
+    }
+  }
+}

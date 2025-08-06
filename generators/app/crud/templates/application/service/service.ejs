@@ -1,0 +1,62 @@
+import { Inject, Injectable } from '@nestjs/common';
+
+import { CollectionDto } from '@common/base/application/dto/collection.dto';
+import { IGetAllOptions } from '@common/base/application/interface/get-all-options.interface';
+
+import { ICreate<%= pascalCase(name) %>Dto } from '@/module/<%= name %>/application/dto/create-<%= name %>.dto.interface';
+import { <%= pascalCase(name) %>ResponseDto } from '@/module/<%= name %>/application/dto/<%= name %>-response.dto';
+import { IUpdate<%= pascalCase(name) %>Dto } from '@/module/<%= name %>/application/dto/update-<%= name %>.dto.interface';
+import { <%= pascalCase(name) %>Mapper } from '@/module/<%= name %>/application/mapper/<%= name %>.mapper';
+import {
+  <%= constantCase(name) %>_REPOSITORY_KEY,
+  I<%= pascalCase(name) %>Repository,
+} from '@/module/<%= name %>/application/repository/<%= name %>.repository.interface';
+import { <%= pascalCase(name) %> } from '@/module/<%= name %>/domain/<%= name %>.entity';
+
+@Injectable()
+export class <%= pascalCase(name) %>Service {
+  constructor(
+    @Inject(<%= constantCase(name) %>_REPOSITORY_KEY)
+    private readonly <%= camelCase(name) %>Repository: I<%= pascalCase(name) %>Repository,
+    private readonly <%= camelCase(name) %>Mapper: <%= pascalCase(name) %>Mapper,
+  ) {}
+
+  async getAll(
+    options: IGetAllOptions<<%= pascalCase(name) %>>,
+  ): Promise<CollectionDto<<%= pascalCase(name) %>ResponseDto>> {
+    const collection = await this.<%= camelCase(name) %>Repository.getAll(options);
+    return new CollectionDto({
+      ...collection,
+      data: collection.data.map((<%= camelCase(name) %>) =>
+        this.<%= camelCase(name) %>Mapper.from<%= pascalCase(name) %>To<%= pascalCase(name) %>ResponseDto(<%= camelCase(name) %>),
+      ),
+    });
+  }
+
+  async getOneByIdOrFail(id: number): Promise<<%= pascalCase(name) %>> {
+    const <%= camelCase(name) %> = await this.<%= camelCase(name) %>Repository.getOneByIdOrFail(id);
+    return this.<%= camelCase(name) %>Mapper.from<%= pascalCase(name) %>To<%= pascalCase(name) %>ResponseDto(<%= camelCase(name) %>);
+  }
+
+  async saveOne(create<%= pascalCase(name) %>Dto: ICreate<%= pascalCase(name) %>Dto): Promise<<%= pascalCase(name) %>ResponseDto> {
+    const <%= camelCase(name) %> = await this.<%= camelCase(name) %>Repository.saveOne(
+      this.<%= camelCase(name) %>Mapper.fromCreate<%= pascalCase(name) %>DtoTo<%= pascalCase(name) %>(create<%= pascalCase(name) %>Dto),
+    );
+    return this.<%= camelCase(name) %>Mapper.from<%= pascalCase(name) %>To<%= pascalCase(name) %>ResponseDto(<%= camelCase(name) %>);
+  }
+
+  async updateOneOrFail(
+    id: number,
+    update<%= pascalCase(name) %>Dto: IUpdate<%= pascalCase(name) %>Dto,
+  ): Promise<<%= pascalCase(name) %>ResponseDto> {
+    const <%= camelCase(name) %> = await this.<%= camelCase(name) %>Repository.updateOneOrFail(
+      id,
+      this.<%= camelCase(name) %>Mapper.fromUpdate<%= pascalCase(name) %>DtoTo<%= pascalCase(name) %>(update<%= pascalCase(name) %>Dto),
+    );
+    return this.<%= camelCase(name) %>Mapper.from<%= pascalCase(name) %>To<%= pascalCase(name) %>ResponseDto(<%= camelCase(name) %>);
+  }
+
+  async deleteOneOrFail(id: number): Promise<void> {
+    return this.<%= camelCase(name) %>Repository.deleteOneOrFail(id);
+  }
+}

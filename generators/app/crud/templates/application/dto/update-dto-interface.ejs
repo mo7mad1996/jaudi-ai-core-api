@@ -1,0 +1,5 @@
+import { ICreate<%= pascalCase(name) %>Dto } from '@/module/<%= kebabCase(name) %>/application/dto/create-<%= kebabCase(name) %>.dto.interface';
+
+export interface IUpdate<%= pascalCase(name) %>Dto extends Partial<ICreate<%= pascalCase(name) %>Dto> {
+  name?: string;
+}

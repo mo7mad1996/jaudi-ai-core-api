@@ -1,0 +1,13 @@
+import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { IsOptional, IsString } from 'class-validator';
+
+import { Create<%= pascalCase(name) %>Dto } from '@/module/<%= kebabCase(name) %>/application/dto/create-<%= kebabCase(name) %>.dto';
+
+export class Update<%= pascalCase(name) %>Dto extends PartialType(
+  Create<%= pascalCase(name) %>Dto,
+) {
+  @ApiProperty({ type: String, required: false, example: 'John' })
+  @IsString()
+  @IsOptional()
+  name?: string;
+}

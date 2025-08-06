@@ -1,0 +1,109 @@
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBody,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
+
+import { CollectionDto } from '@common/base/application/dto/collection.dto';
+import { PageQueryParamsDto } from '@common/base/application/dto/page-query-params.dto';
+
+import { Policies } from '@iam/authorization/infrastructure/policy/decorator/policy.decorator';
+import { PoliciesGuard } from '@iam/authorization/infrastructure/policy/guard/policy.guard';
+
+import { Create<%= pascalCase(name) %>Dto } from '@/module/<%= kebabCase(name) %>/application/dto/create-<%= kebabCase(name) %>.dto';
+import { <%= pascalCase(name) %>FilterQueryParamsDto } from '@/module/<%= kebabCase(name) %>/application/dto/<%= kebabCase(name) %>-filter-query-params.dto';
+import { <%= pascalCase(name) %>ResponseDto } from '@/module/<%= kebabCase(name) %>/application/dto/<%= kebabCase(name) %>-response.dto';
+import { <%= pascalCase(name) %>SortQueryParamsDto } from '@/module/<%= kebabCase(name) %>/application/dto/<%= kebabCase(name) %>-sort-query-params.dto';
+import { Update<%= pascalCase(name) %>Dto } from '@/module/<%= kebabCase(name) %>/application/dto/update-<%= kebabCase(name) %>.dto';
+import { Create<%= pascalCase(name) %>PolicyHandler } from '@/module/<%= kebabCase(name) %>/application/policy/create-<%= kebabCase(name) %>-policy.handler';
+import { Delete<%= pascalCase(name) %>PolicyHandler } from '@/module/<%= kebabCase(name) %>/application/policy/delete-<%= kebabCase(name) %>-policy.handler';
+import { Read<%= pascalCase(name) %>PolicyHandler } from '@/module/<%= kebabCase(name) %>/application/policy/read-<%= kebabCase(name) %>-policy.handler';
+import { Update<%= pascalCase(name) %>PolicyHandler } from '@/module/<%= kebabCase(name) %>/application/policy/update-<%= kebabCase(name) %>-policy.handler';
+import { <%= pascalCase(name) %>Service } from '@/module/<%= kebabCase(name) %>/application/service/<%= kebabCase(name) %>.service';
+
+@Controller('<%= kebabCase(name) %>')
+@UseGuards(PoliciesGuard)
+@ApiTags('<%= kebabCase(name) %>')
+export class <%= pascalCase(name) %>Controller {
+  constructor(private readonly <%= camelCase(name) %>Service: <%= pascalCase(name) %>Service) {}
+
+  @Get()
+  @Policies(Read<%= pascalCase(name) %>PolicyHandler)
+  @ApiOperation({ summary: 'Get all <%= pascalCase(name) %> or filtered by query' })
+  @ApiOkResponse({ type: CollectionDto<<%= pascalCase(name) %>ResponseDto> })
+  getAll(
+    @Query('page') page: PageQueryParamsDto,
+    @Query('filter') filter: <%= pascalCase(name) %>FilterQueryParamsDto,
+    @Query('sort') sort: <%= pascalCase(name) %>SortQueryParamsDto,
+  ): Promise<CollectionDto<<%= pascalCase(name) %>ResponseDto>> {
+    return this.<%= camelCase(name) %>Service.getAll({
+      page,
+      filter,
+      sort,
+    });
+  }
+
+  @Get(':id')
+  @Policies(Read<%= pascalCase(name) %>PolicyHandler)
+  @ApiParam({ name: 'id', type: Number })
+  @ApiOperation({ summary: 'Get one <%= pascalCase(name) %> by id or throw not found' })
+  @ApiOkResponse({ type: <%= pascalCase(name) %>ResponseDto })
+  getOneByIdOrFail(@Param('id') id: number) {
+    return this.<%= camelCase(name) %>Service.getOneByIdOrFail(id);
+  }
+
+  @Post()
+  @Policies(Create<%= pascalCase(name) %>PolicyHandler)
+  @ApiOperation({ summary: 'Create new <%= pascalCase(name) %>' })
+  @ApiCreatedResponse({ type: <%= pascalCase(name) %>ResponseDto })
+  @ApiBody({ type: Create<%= pascalCase(name) %>Dto })
+  saveOne(
+    @Body() create<%= pascalCase(name) %>Dto: Create<%= pascalCase(name) %>Dto,
+  ): Promise<<%= pascalCase(name) %>ResponseDto> {
+    return this.<%= camelCase(name) %>Service.saveOne(create<%= pascalCase(name) %>Dto);
+  }
+
+  @Patch(':id')
+  @Policies(Update<%= pascalCase(name) %>PolicyHandler)
+  @ApiParam({ name: 'id', type: Number })
+  @ApiOperation({
+    summary: 'Update one <%= pascalCase(name) %> by id or throw not found',
+  })
+  @ApiOkResponse({ type: <%= pascalCase(name) %>ResponseDto })
+  @ApiBody({ type: Update<%= pascalCase(name) %>Dto })
+  updateOneOrFail(
+    @Param('id') id: number,
+    @Body() update<%= pascalCase(name) %>Dto: Update<%= pascalCase(name) %>Dto,
+  ): Promise<<%= pascalCase(name) %>ResponseDto> {
+    return this.<%= camelCase(name) %>Service.updateOneOrFail(
+      id,
+      update<%= pascalCase(name) %>Dto,
+    );
+  }
+
+  @Delete(':id')
+  @Policies(Delete<%= pascalCase(name) %>PolicyHandler)
+  @ApiParam({ name: 'id', type: Number })
+  @ApiOperation({
+    summary: 'Delete one <%= pascalCase(name) %> by id or throw not found',
+  })
+  @ApiOkResponse({ status: 200 })
+  deleteOneOrFail(@Param('id') id: number) {
+    return this.<%= camelCase(name) %>Service.deleteOneOrFail(id);
+  }
+}

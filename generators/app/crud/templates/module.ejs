@@ -1,0 +1,50 @@
+import { Module, Provider } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+import { AuthorizationModule } from '@iam/authorization/authorization.module';
+
+import { <%= pascalCase(name) %>Mapper } from '@/module/<%= kebabCase(name) %>/application/mapper/<%= kebabCase(name) %>.mapper';
+import { Create<%= pascalCase(name) %>PolicyHandler } from '@/module/<%= kebabCase(name) %>/application/policy/create-<%= kebabCase(name) %>-policy.handler';
+import { Delete<%= pascalCase(name) %>PolicyHandler } from '@/module/<%= kebabCase(name) %>/application/policy/delete-<%= kebabCase(name) %>-policy.handler';
+import { Read<%= pascalCase(name) %>PolicyHandler } from '@/module/<%= kebabCase(name) %>/application/policy/read-<%= kebabCase(name) %>-policy.handler';
+import { Update<%= pascalCase(name) %>PolicyHandler } from '@/module/<%= kebabCase(name) %>/application/policy/update-<%= kebabCase(name) %>-policy.handler';
+import { <%= constantCase(name) %>_REPOSITORY_KEY } from '@/module/<%= kebabCase(name) %>/application/repository/<%= kebabCase(name) %>.repository.interface';
+import { <%= pascalCase(name) %>Service } from '@/module/<%= kebabCase(name) %>/application/service/<%= kebabCase(name) %>.service';
+import { <%= camelCase(name) %>Permissions } from '@/module/<%= kebabCase(name) %>/domain/<%= kebabCase(name) %>.permission';
+import { <%= pascalCase(name) %>MySqlRepository } from '@/module/<%= kebabCase(name) %>/infrastructure/database/<%= kebabCase(name) %>.mysql.repository';
+import { <%= pascalCase(name) %>Schema } from '@/module/<%= kebabCase(name) %>/infrastructure/database/<%= kebabCase(name) %>.schema';
+import { <%= pascalCase(name) %>Controller } from '@/module/<%= kebabCase(name) %>/interface/<%= kebabCase(name) %>.controller';
+
+const <%= camelCase(name) %>RepositoryProvider: Provider = {
+  provide: <%= constantCase(name) %>_REPOSITORY_KEY,
+  useClass: <%= pascalCase(name) %>MySqlRepository,
+};
+
+const policyHandlersProviders = [
+  Read<%= pascalCase(name) %>PolicyHandler,
+  Update<%= pascalCase(name) %>PolicyHandler,
+  Delete<%= pascalCase(name) %>PolicyHandler,
+  Create<%= pascalCase(name) %>PolicyHandler,
+];
+
+@Module({
+  imports: [
+    TypeOrmModule.forFeature([<%= pascalCase(name) %>Schema]),
+    AuthorizationModule.forFeature({
+      permissions: <%= camelCase(name) %>Permissions,
+    }),
+  ],
+  providers: [
+    <%= pascalCase(name) %>Service,
+    <%= pascalCase(name) %>Mapper,
+    <%= camelCase(name) %>RepositoryProvider,
+    ...policyHandlersProviders,
+  ],
+  controllers: [<%= pascalCase(name) %>Controller],
+  exports: [
+    <%= pascalCase(name) %>Service,
+    <%= pascalCase(name) %>Mapper,
+    <%= camelCase(name) %>RepositoryProvider,
+  ],
+})
+export class <%= pascalCase(name) %>Module {}

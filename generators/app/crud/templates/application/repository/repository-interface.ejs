@@ -1,0 +1,18 @@
+import { ICollection } from '@common/base/application/dto/collection.interface';
+import { IGetAllOptions } from '@common/base/application/interface/get-all-options.interface';
+
+import { <%= pascalCase(name) %> } from '@/module/<%= kebabCase(name) %>/domain/<%= kebabCase(name) %>.entity';
+
+export const <%= constantCase(name) %>_REPOSITORY_KEY = '<%= kebabCase(name) %>_repository';
+
+export interface I<%= pascalCase(name) %>Repository {
+  getAll(options?: IGetAllOptions<<%= pascalCase(name) %>>): Promise<ICollection<<%= pascalCase(name) %>>>;
+  getOneByIdOrFail(id: number): Promise<<%= pascalCase(name) %>>;
+  getOneById(id: number): Promise<<%= pascalCase(name) %>>;
+  saveOne(<%= camelCase(name) %>: <%= pascalCase(name) %>): Promise<<%= pascalCase(name) %>>;
+  updateOneOrFail(
+    id: number,
+    updates: Partial<Omit<<%= pascalCase(name) %>, 'id'>>,
+  ): Promise<<%= pascalCase(name) %>>;
+  deleteOneOrFail(id: number): Promise<void>;
+}

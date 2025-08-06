@@ -1,0 +1,11 @@
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsNotEmpty, IsString } from 'class-validator';
+
+import { ICreate<%= pascalCase(name) %>Dto } from '@/module/<%= kebabCase(name) %>/application/dto/create-<%= kebabCase(name) %>.dto.interface';
+
+export class Create<%= pascalCase(name) %>Dto implements ICreate<%= pascalCase(name) %>Dto {
+  @ApiPropertyOptional({ type: String, example: 'John' })
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+}

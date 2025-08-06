@@ -1,0 +1,86 @@
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
+import { ICollection } from '@common/base/application/dto/collection.interface';
+import { IGetAllOptions } from '@common/base/application/interface/get-all-options.interface';
+
+import { I<%= pascalCase(name) %>Repository } from '@/module/<%= kebabCase(name) %>/application/repository/<%= kebabCase(name) %>.repository.interface';
+import { <%= pascalCase(name) %> } from '@/module/<%= kebabCase(name) %>/domain/<%= kebabCase(name) %>.entity';
+import { <%= pascalCase(name) %>Schema } from '@/module/<%= kebabCase(name) %>/infrastructure/database/<%= kebabCase(name) %>.schema';
+import { <%= pascalCase(name) %>NotFoundException } from '@/module/<%= kebabCase(name) %>/infrastructure/database/exception/<%= kebabCase(name) %>-not-found.exception';
+
+export class <%= pascalCase(name) %>MySqlRepository implements I<%= pascalCase(name) %>Repository {
+  constructor(
+    @InjectRepository(<%= pascalCase(name) %>Schema)
+    private readonly repository: Repository<<%= pascalCase(name) %>>,
+  ) {}
+
+  async getAll(options?: IGetAllOptions<<%= pascalCase(name) %>>): Promise<ICollection<<%= pascalCase(name) %>>> {
+    const { filter, page, sort, fields } = options || {};
+
+    const [items, itemCount] = await this.repository.findAndCount({
+      where: filter,
+      order: sort,
+      select: fields,
+      take: page.size,
+      skip: page.offset,
+    });
+
+    return {
+      data: items,
+      pageNumber: page.number,
+      pageSize: page.size,
+      pageCount: Math.ceil(itemCount / page.size),
+      itemCount,
+    };
+  }
+
+  async getOneByIdOrFail(id: number): Promise<<%= pascalCase(name) %>> {
+    const <%= pascalCase(name) %> = await this.repository.findOne({
+      where: { id },
+    });
+
+    if (!<%= pascalCase(name) %>) {
+      throw new <%= pascalCase(name) %>NotFoundException(`<%= pascalCase(name) %> with ID ${id} not found`);
+    }
+
+    return <%= pascalCase(name) %>;
+  }
+
+  async getOneById(id: number): Promise<<%= pascalCase(name) %>> {
+    return this.repository.findOne({
+      where: { id },
+    });
+  }
+
+  async saveOne(<%= camelCase(name) %>: <%= pascalCase(name) %>): Promise<<%= pascalCase(name) %>> {
+    return this.repository.save(<%= camelCase(name) %>);
+  }
+
+  async updateOneOrFail(
+    id: number,
+    updates: Partial<Omit<<%= pascalCase(name) %>, 'id'>>,
+  ): Promise<<%= pascalCase(name) %>> {
+    const <%= camelCase(name) %>ToUpdate = await this.repository.preload({
+      ...updates,
+      id,
+    });
+
+    if (!<%= camelCase(name) %>ToUpdate) {
+      throw new <%= pascalCase(name) %>NotFoundException(`<%= pascalCase(name) %> with ID ${id} not found`);
+    }
+
+    return this.repository.save(<%= camelCase(name) %>ToUpdate);
+  }
+  async deleteOneOrFail(id: number): Promise<void> {
+    const <%= camelCase(name) %>ToDelete = await this.repository.findOne({
+      where: { id },
+    });
+
+    if (!<%= camelCase(name) %>ToDelete) {
+      throw new <%= pascalCase(name) %>NotFoundException(`<%= pascalCase(name) %> with ID ${id} not found`);
+    }
+
+    await this.repository.softDelete({ id });
+  }
+}
